@@ -2369,16 +2369,16 @@ bool KTextEditor::DocumentPrivate::saveFile()
         return false;
 
     // update file type, pass no file path, read file type content from this document
-    updateFileType(KTextEditor::EditorPrivate::self()->modeManager()->fileType(this, QString()));
-
-    // remember the oldpath...
     QString oldPath = m_dirWatchFile;
+    QFileInfo fo(oldPath), fn(localFilePath());
 
-    // read dir config (if possible and wanted)
-    if (url().isLocalFile()) {
-        QFileInfo fo(oldPath), fn(localFilePath());
+    // only update file type if path has changed so that variables are not overridden on normal
+    // save
+    if (fo.path() != fn.path()) {
+        updateFileType(KTextEditor::EditorPrivate::self()->modeManager()->fileType(this, QString()));
 
-        if (fo.path() != fn.path()) {
+        if (url().isLocalFile()) {
+            // if file is local then read dir config for new path
             readDirConfig();
         }
     }
